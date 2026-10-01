@@ -1,0 +1,8 @@
+{
+  "name": "hello-greeter",
+  "version": "1.0.0",
+  "description": "Tiny app that greets you based on the time of day",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "license": "MIT"
+}
