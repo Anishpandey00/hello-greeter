@@ -54,12 +54,12 @@ git commit -m "Improve Docker setup and add Compose"
 git push origin main
 ```
 
-The existing GitHub Actions workflow builds and publishes to Docker Hub on pushes to `main`. Configure these repository secrets under **Settings > Secrets and variables > Actions** before pushing:
+GitHub Actions builds and tests the container on pushes to `main` and pull requests. Publishing to Docker Hub is optional: configure these repository secrets under **Settings > Secrets and variables > Actions** to enable it on pushes to `main`:
 
 - `DOCKERHUB_USERNAME`: your Docker Hub username.
 - `DOCKERHUB_TOKEN`: a Docker Hub access token with permission to push images.
 
-Without those secrets, the publishing workflow will fail. Never put tokens in project files or chat.
+Without both secrets, build and test checks still run, and publishing is skipped with a notice in the workflow summary. Never put tokens in project files or chat.
 
 After publishing, others can run:
 

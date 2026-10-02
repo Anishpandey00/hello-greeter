@@ -1,8 +1,13 @@
-name: Build and push Docker image
+name: Build and test Docker image
 
 on:
   push:
     branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   docker:
@@ -10,13 +15,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/login-action@v3
+      - name: Build and start container
+        run: docker compose up --build -d --wait --wait-timeout 60
+
+      - name: Check homepage and greeting API
+        run: |
+          curl --fail --silent http://localhost:3000/ | grep -q 'Hello Greeter'
+          curl --fail --silent http://localhost:3000/health | python3 -c 'import json,sys; assert json.load(sys.stdin)["status"] == "ok"'
+          curl --fail --silent 'http://localhost:3000/api/greeting?hour=9' | python3 -c 'import json,sys; assert json.load(sys.stdin) == {"greeting": "Good morning", "hour": 9}'
+
+      - name: Check Docker Hub configuration
+        id: hub
+        if: github.event_name != 'pull_request'
+        env:
+          HUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          HUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$HUB_USERNAME" ] && [ -n "$HUB_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "### Docker Hub publishing skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "Container checks passed. Add DOCKERHUB_USERNAME and DOCKERHUB_TOKEN repository secrets to enable publishing." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Log in to Docker Hub
+        if: steps.hub.outputs.configured == 'true'
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hello-greeter:latest
+      - name: Publish tested image
+        if: steps.hub.outputs.configured == 'true'
+        env:
+          HUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker tag hello-greeter:local "$HUB_USERNAME/hello-greeter:latest"
+          docker push "$HUB_USERNAME/hello-greeter:latest"
+
+      - name: Container logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Clean up
+        if: always()
+        run: docker compose down
