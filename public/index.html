@@ -1,34 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hello Greeter</title>
-  <style>
-    body { margin: 0; height: 100vh; display: flex; flex-direction: column;
-           align-items: center; justify-content: center;
-           font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; }
-    h1 { font-size: 3rem; margin: 0 0 .5rem; }
-    p  { color: #94a3b8; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#faf6ee" />
+<title>Hello Greeter · Namaste</title>
+<style>
+  :root { color-scheme: light; --ink:#283c35; --muted:#70796c; --red:#a83c43; --cream:#faf6ee; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:Arial,sans-serif; }
+  .page { max-width:1240px; margin:auto; padding:30px 6vw 22px; }
+  header, footer { display:flex; align-items:center; justify-content:space-between; gap:18px; }
+  .brand { font-family:Georgia,serif; font-size:23px; letter-spacing:-1px; }
+  .brand span { color:var(--red); }
+  .eyebrow { font-size:10px; text-transform:uppercase; letter-spacing:2.5px; font-weight:700; }
+  .origin { color:var(--muted); }
+  main { min-height:calc(100svh - 147px); display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:40px; padding:38px 0; }
+  .intro { max-width:490px; }
+  .welcome { color:var(--red); display:flex; align-items:center; gap:12px; }
+  .welcome::before { content:''; width:32px; height:1px; background:var(--red); }
+  h1 { font-family:Georgia,serif; font-weight:400; font-size:clamp(48px,6.5vw,86px); line-height:1.06; letter-spacing:-3px; margin:26px 0 22px; }
+  h1 span { display:block; color:var(--red); font-style:italic; }
+  .description { font-size:16px; line-height:1.85; color:var(--muted); max-width:360px; }
+  .controls { display:flex; flex-wrap:wrap; align-items:center; gap:18px; margin-top:32px; }
+  button { font:inherit; cursor:pointer; }
+  .greet { border:0; border-radius:99px; background:var(--ink); color:white; padding:17px 24px; font-size:13px; transition:background .2s,transform .2s; }
+  .greet:hover { background:#405b4e; transform:translateY(-2px); }
+  .greet:disabled { cursor:default; opacity:.7; transform:none; }
+  button:focus-visible, input:focus-visible { outline:3px solid #bc863c; outline-offset:5px; }
+  .sound { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:12px; cursor:pointer; }
+  .sound input { accent-color:var(--red); width:16px; height:16px; }
+  .time { margin-top:35px; display:flex; align-items:center; gap:9px; font-size:11px; color:var(--muted); letter-spacing:.7px; }
+  .dot { width:6px; height:6px; background:#839476; border-radius:50%; }
+  .scene { position:relative; width:100%; max-width:480px; justify-self:center; }
+  .portrait { display:block; width:100%; overflow:visible; }
+  .bubble { position:absolute; top:4%; right:0; padding:15px 23px; border:1px solid #e4dccd; border-radius:20px 20px 20px 2px; background:#fffdf7; transform:rotate(5deg); box-shadow:0 8px 25px #74604608; text-align:center; }
+  .bubble strong { display:block; color:var(--red); font-size:23px; font-weight:400; }
+  .bubble small { font-size:10px; color:var(--muted); letter-spacing:1px; }
+  .caption { text-align:center; color:var(--muted); font-size:10px; letter-spacing:1.8px; text-transform:uppercase; margin-top:6px; }
+  .head { transform-origin:240px 190px; }
+  .upper { transform-origin:240px 315px; }
+  .hands { transform-origin:240px 253px; }
+  .bowing .head { animation:headBow 2.6s ease-in-out; }
+  .bowing .upper { animation:bodyBow 2.6s ease-in-out; }
+  .bowing .hands { animation:namaste 2.6s ease-in-out; }
+  .bowing .eyes { animation:closeEyes 2.6s ease-in-out; transform-box:fill-box; transform-origin:center; }
+  .bowing .bubble { animation:hello 2.6s ease-in-out; }
+  @keyframes headBow { 0%,100% { transform:translateY(0) rotate(0); } 35%,65% { transform:translateY(13px) rotate(9deg); } }
+  @keyframes bodyBow { 0%,100% { transform:scaleY(1); } 35%,65% { transform:translateY(5px) scaleY(.96); } }
+  @keyframes namaste { 0%,100% { transform:translateY(0); } 35%,65% { transform:translateY(-8px); } }
+  @keyframes closeEyes { 0%,15%,85%,100% { transform:scaleY(1); } 35%,65% { transform:scaleY(.15); } }
+  @keyframes hello { 0%,100% { transform:rotate(5deg); } 40%,60% { transform:translateY(-6px) rotate(0); } }
+  footer { border-top:1px solid #e5dfd4; padding-top:20px; color:var(--muted); font-size:10px; letter-spacing:.4px; }
+  footer span:last-child { font-family:Georgia,serif; font-style:italic; font-size:13px; }
+  .status { min-height:16px; margin:12px 0 0; color:var(--muted); font-size:11px; }
+  @media(max-width:700px) { .page { padding:24px 7vw; } header .origin { font-size:8px; letter-spacing:1px; } main { grid-template-columns:1fr; gap:20px; padding-top:45px; } .intro { text-align:center; margin:auto; } .welcome,.controls,.time { justify-content:center; } h1 { font-size:58px; margin:20px 0; } .description { margin:auto; } .time { margin-top:20px; } .scene { max-width:350px; } footer { margin-top:25px; } }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+</style>
 </head>
 <body>
-  <h1 id="greeting">Hello!</h1>
-  <p id="clock"></p>
-  <script>
-    function greetingFor(hour) {
-      if (hour >= 5 && hour < 12) return "Good morning";
-      if (hour >= 12 && hour < 17) return "Good afternoon";
-      if (hour >= 17 && hour < 21) return "Good evening";
-      return "Good night";
+<div class="page">
+<header><div class="brand">hello<span> / </span>namaste</div><div class="origin eyebrow">A little warmth from Nepal</div></header>
+<main>
+  <section class="intro" aria-label="Welcome">
+    <div class="welcome eyebrow">A greeting, just for you</div>
+    <h1><span id="greeting">Good morning.</span>Namaste.</h1>
+    <p class="description">A smile, folded hands, and a little moment of kindness. Wherever you are, you’re welcome here.</p>
+    <div class="controls">
+      <button class="greet" id="greet-button" type="button">Greet me again <span aria-hidden="true">↗</span></button>
+      <label class="sound"><input id="sound" type="checkbox" /> Voice greeting</label>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+    <div class="time"><span class="dot" aria-hidden="true"></span><time id="clock"></time><span>· YOUR LOCAL TIME</span></div>
+  </section>
+  <section class="scene" id="scene" aria-label="Animated namaste greeting">
+    <div class="bubble"><strong lang="ne">नमस्ते</strong><small>HELLO, WITH RESPECT</small></div>
+    <svg class="portrait" viewBox="0 0 480 535" role="img" aria-labelledby="character-title character-description">
+      <title id="character-title">A girl greeting you with namaste</title>
+      <desc id="character-description">An illustrated girl in a Nepali-inspired red sari and green blouse, with gold jewelry and a red tika. She holds her palms together and bows her head.</desc>
+      <defs>
+        <linearGradient id="arch" x2="0" y2="1"><stop stop-color="#eee8d9"/><stop offset="1" stop-color="#f2ecdf"/></linearGradient>
+        <linearGradient id="sari" x2="1" y2="1"><stop stop-color="#b9434e"/><stop offset="1" stop-color="#8c303d"/></linearGradient>
+        <pattern id="motif" width="28" height="30" patternUnits="userSpaceOnUse"><path d="M14 9l3 5-3 5-3-5z" fill="#e6b873" opacity=".6"/></pattern>
+      </defs>
+      <path d="M40 475V225a200 200 0 0 1 400 0v250z" fill="url(#arch)"/>
+      <circle cx="342" cy="141" r="35" fill="#e1b96f" opacity=".55"/>
+      <path d="M40 344l70-90 47 52 62-90 76 101 43-58 102 99v117H40z" fill="#dadccc"/>
+      <path d="M110 254l-22 29 22-8 12 7 12-1zM219 216l-25 36 25-11 19 10z" fill="#faf6ee"/>
+      <path d="M40 393q100-60 203-6t197-6v94H40z" fill="#c3cbb8"/>
+      <ellipse cx="240" cy="488" rx="120" ry="12" fill="#40503a" opacity=".12"/>
+      <g fill="none" stroke="#788c70" stroke-width="2" opacity=".65"><path d="M80 476q9-65-12-111M81 450q-27-9-30-29M80 430q23-11 24-31M401 476q-8-46 12-90M403 449q23-3 27-23"/></g>
+      <g fill="#8c9c7b"><ellipse cx="68" cy="386" rx="7" ry="18" transform="rotate(-20 68 386)"/><ellipse cx="56" cy="426" rx="7" ry="17" transform="rotate(-43 56 426)"/><ellipse cx="100" cy="407" rx="7" ry="17" transform="rotate(28 100 407)"/><ellipse cx="414" cy="402" rx="7" ry="18" transform="rotate(25 414 402)"/><ellipse cx="426" cy="435" rx="7" ry="15" transform="rotate(45 426 435)"/></g>
+      <path d="M195 460l-8 25q12 12 39 1l4-26M254 460l1 26q29 10 39-2l-13-24" fill="#a66d50"/>
+      <path d="M186 484q21 7 40-2v10h-40zM255 482q22 9 39 1v9h-39z" fill="#70363b"/>
+      <path d="M196 285q-24 67-27 188 71 18 141 0-6-116-35-188z" fill="url(#sari)"/>
+      <path d="M196 285q-24 67-27 188 71 18 141 0-6-116-35-188z" fill="url(#motif)"/>
+      <path d="M171 457q69 18 137 0l2 16q-72 19-141 0z" fill="#dcad61"/>
+      <g fill="none" stroke="#702e3a" stroke-width="2" opacity=".5"><path d="M219 318l-15 136M241 318v141M260 318l19 134"/></g>
+      <g class="upper">
+        <path d="M217 182q-33 0-48 30l-17 52 34 13 18-36-8 73q42 16 82-1l-3-72 18 36 34-13-17-52q-14-30-47-30" fill="#3c6854"/>
+        <path d="M170 213l-15 40 33 12 16-42M278 220l15 44 31-11-15-40" fill="#477b62"/>
+        <path d="M156 249l33 12-4 12-33-12M292 261l32-12 4 12-32 12" fill="#deb569"/>
+        <path d="M259 182l29 13-70 117-23-2z" fill="url(#sari)"/>
+        <path d="M259 182l9 4-65 126-8-2z" fill="#e1b269"/>
+        <path d="M274 190l8 3-66 120-8-1z" fill="#e1b269"/>
+        <path d="M219 176v22q21 19 42 0v-22" fill="#c68b67"/>
+        <path d="M214 196q25 52 53 0" fill="none" stroke="#dcaf58" stroke-width="6"/>
+        <circle cx="240" cy="224" r="8" fill="#e5ba65"/><circle cx="240" cy="224" r="3" fill="#b54948"/>
+        <g class="head">
+          <ellipse cx="240" cy="126" rx="58" ry="70" fill="#2c292b"/>
+          <ellipse cx="238" cy="68" rx="30" ry="21" fill="#2c292b"/>
+          <path d="M207 70q30-18 61 0" fill="none" stroke="#c49448" stroke-width="4"/>
+          <ellipse cx="190" cy="141" rx="9" ry="14" fill="#ca906d"/><ellipse cx="290" cy="141" rx="9" ry="14" fill="#ca906d"/>
+          <path d="M194 109q2-31 46-30 45 0 47 32v31q-3 49-47 51-43-4-46-51z" fill="#dda780"/>
+          <path d="M192 114q32-1 49-29 13 25 48 33l-3-34-38-17-43 14z" fill="#2c292b"/>
+          <path d="M206 126q10-6 20-1M254 125q10-5 20 1" stroke="#4c3630" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <g class="eyes" fill="#342d2c"><ellipse cx="216" cy="138" rx="4" ry="5"/><ellipse cx="264" cy="138" rx="4" ry="5"/></g>
+          <path d="M239 140l-3 13 6 1" fill="none" stroke="#b77d5c" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="210" cy="154" rx="10" ry="5" fill="#c87566" opacity=".4"/><ellipse cx="271" cy="154" rx="10" ry="5" fill="#c87566" opacity=".4"/>
+          <path d="M228 168q12 11 24 0" fill="#a24c47"/><path d="M229 168h22" stroke="#fff1da" stroke-width="2"/>
+          <path d="M240 106v11" stroke="#b53a42" stroke-width="5" stroke-linecap="round"/>
+          <g fill="#e5b95f"><circle cx="190" cy="160" r="4"/><path d="M190 164l-8 12q8 8 16 0z"/><circle cx="290" cy="160" r="4"/><path d="M290 164l-8 12q8 8 16 0z"/></g>
+          <circle cx="251" cy="153" r="3" fill="none" stroke="#e7bc69" stroke-width="1.5"/>
+        </g>
+        <g class="hands">
+          <path d="M169 271q13 33 34 17l32-34-9-17-35 29-10-8z" fill="#dda780"/>
+          <path d="M311 271q-13 33-34 17l-32-34 9-17 35 29 10-8z" fill="#dda780"/>
+          <path d="M218 251l12 10M214 257l12 10M262 251l-12 10M266 257l-12 10" stroke="#e3b45d" stroke-width="5"/>
+          <path d="M239 255q-17-7-17-20l11-28q5-8 7 1v43M241 255q17-7 17-20l-11-28q-5-8-7 1v43" fill="#e4b18d" stroke="#ba805f" stroke-width="1.2"/>
+          <path d="M240 211v43" stroke="#b57b5a" stroke-width="1.5"/>
+        </g>
+      </g>
+    </svg>
+    <div class="caption">Folded hands. An open heart.</div>
+  </section>
+</main>
+<footer><span>HELLO GREETER · MADE TO MAKE YOU SMILE</span><span>A small hello goes a long way.</span></footer>
+</div>
+<script>
+  const scene = document.getElementById('scene');
+  const button = document.getElementById('greet-button');
+  const voice = document.getElementById('sound');
+  const status = document.getElementById('status');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let greetingTimer;
+  function greetingFor(hour) {
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
+  }
+  function update() {
+    const now = new Date();
+    document.getElementById('greeting').textContent = greetingFor(now.getHours()) + '.';
+    const clock = document.getElementById('clock');
+    clock.textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    clock.dateTime = now.toISOString();
+  }
+  function greet(withVoice = false) {
+    clearTimeout(greetingTimer);
+    scene.classList.remove('bowing');
+    if (!reducedMotion.matches) {
+      void scene.offsetWidth;
+      scene.classList.add('bowing');
     }
-    function update() {
-      const now = new Date();
-      document.getElementById("greeting").textContent = greetingFor(now.getHours()) + "! 👋";
-      document.getElementById("clock").textContent = now.toLocaleTimeString();
+    button.disabled = true;
+    status.textContent = 'Namaste! ' + greetingFor(new Date().getHours()) + '. Welcome!';
+    if (withVoice && voice.checked && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const words = new SpeechSynthesisUtterance('Namaste. ' + greetingFor(new Date().getHours()) + '. Welcome!');
+      words.lang = 'en-US';
+      words.rate = .85;
+      window.speechSynthesis.speak(words);
     }
-    update();
-    setInterval(update, 1000);
-  </script>
+    greetingTimer = setTimeout(() => {
+      scene.classList.remove('bowing');
+      button.disabled = false;
+    }, reducedMotion.matches ? 300 : 2600);
+  }
+  if (!('speechSynthesis' in window)) voice.parentElement.hidden = true;
+  button.addEventListener('click', () => greet(true));
+  update();
+  setInterval(update, 1000);
+  greet();
+</script>
 </body>
 </html>

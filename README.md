@@ -1,13 +1,23 @@
 # Hello Greeter
 
-A small Node.js app that greets you using your browser's local time.
+A small Node.js app with an animated Nepali-inspired namaste greeting, a bowing character, a local clock, and an optional voice greeting.
 
 ## Run with Docker Desktop
 
-Start Docker Desktop, then run from this folder:
+Install Git and Docker Desktop on Windows, macOS, or Linux, and start Docker Desktop. On Linux, Docker Engine with the Compose plugin also works. Internet access is needed for the initial clone and image build. Node.js does not need to be installed separately.
+
+For the first run, open Terminal or PowerShell:
 
 ```sh
+git clone https://github.com/Anishpandey00/hello-greeter.git
+cd hello-greeter
 docker compose up --build -d
+```
+
+For later starts, open a terminal in the project folder and run:
+
+```sh
+docker compose up -d
 ```
 
 Open http://localhost:3000.
@@ -18,7 +28,18 @@ docker compose ps        # Check container health
 docker compose down      # Stop and remove the container
 ```
 
-If port 3000 is already in use:
+The girl bows automatically when the page opens. Use **Greet me again** to replay it. Enable **Voice greeting** before replaying to hear the greeting. Speech availability, pronunciation, and voice vary by browser and installed system voices; reduced-motion preferences disable the animation. The displayed greeting follows each visitor's own local time.
+
+To get the latest version of an unmodified checkout:
+
+```sh
+git pull --ff-only
+docker compose up --build -d
+```
+
+If port 3000 is already in use, create a file named `.env` beside `compose.yaml` containing `HOST_PORT=8080`, then run `docker compose up --build -d`. This works in Terminal and PowerShell.
+
+Alternatively, on macOS/Linux:
 
 ```sh
 HOST_PORT=8080 docker compose up --build -d
@@ -49,7 +70,7 @@ Review and push your changes:
 
 ```sh
 git diff
-git add Dockerfile compose.yaml .dockerignore server.js README.md
+git add public/index.html Dockerfile compose.yaml .dockerignore server.js README.md
 git commit -m "Improve Docker setup and add Compose"
 git push origin main
 ```
