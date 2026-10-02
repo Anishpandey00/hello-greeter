@@ -2,6 +2,14 @@
 
 A small Node.js app with an animated Nepali-inspired namaste greeting, a bowing character, a local clock, and an optional voice greeting.
 
+## Open the website online
+
+Visit https://anishpandey00.github.io/hello-greeter/ — no installation required.
+
+GitHub Pages serves the greeting page, character animation, local clock, and optional browser voice greeting. It stays available when your computer is off. The Node.js API endpoints are available only when running the server locally or with Docker.
+
+Changes to `public/` on `main` are published automatically by the Pages workflow.
+
 ## Run with Docker Desktop
 
 Install Git and Docker Desktop on Windows, macOS, or Linux, and start Docker Desktop. On Linux, Docker Engine with the Compose plugin also works. Internet access is needed for the initial clone and image build. Node.js does not need to be installed separately.
