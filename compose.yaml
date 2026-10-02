@@ -1,0 +1,8 @@
+services:
+  greeter:
+    build: .
+    image: hello-greeter:local
+    ports:
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"
+    init: true
+    restart: unless-stopped

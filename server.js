@@ -12,11 +12,15 @@ function greetingFor(hour) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/api/greeting") {
+  const url = new URL(req.url, "http://localhost");
+  if (url.pathname === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({ status: "ok" }));
+  }
+  if (url.pathname === "/api/greeting") {
     // Optional ?hour=0-23 lets the client send its own local hour
-    const url = new URL(req.url, `http://${req.headers.host}`);
     const hourParam = parseInt(url.searchParams.get("hour"), 10);
-    const hour = Number.isInteger(hourParam) ? hourParam : new Date().getHours();
+    const hour = Number.isInteger(hourParam) && hourParam >= 0 && hourParam <= 23 ? hourParam : new Date().getHours();
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ greeting: greetingFor(hour), hour }));
   }
@@ -32,3 +36,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => console.log(`Greeter running on port ${PORT}`));
+
+for (const signal of ["SIGTERM", "SIGINT"]) {
+  process.on(signal, () => server.close(() => process.exit(0)));
+}

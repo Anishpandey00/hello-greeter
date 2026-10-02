@@ -1,35 +1,68 @@
 # Hello Greeter
 
-A tiny Node.js app that says Good morning / afternoon / evening / night based on the time.
+A small Node.js app that greets you using your browser's local time.
 
-## Run locally
-    node server.js
-    # open http://localhost:3000
+## Run with Docker Desktop
 
-## Run with Docker
-    docker build -t hello-greeter .
-    docker run -p 3000:3000 hello-greeter
-    # open http://localhost:3000
+Start Docker Desktop, then run from this folder:
 
-## Push to GitHub
-    git init
-    git add .
-    git commit -m "Initial commit: hello greeter app with Docker"
-    git branch -M main
-    git remote add origin https://github.com/<your-username>/hello-greeter.git
-    git push -u origin main
+```sh
+docker compose up --build -d
+```
 
-## Push the image to Docker Hub (manual)
-    docker login
-    docker build -t <dockerhub-username>/hello-greeter:latest .
-    docker push <dockerhub-username>/hello-greeter:latest
+Open http://localhost:3000.
 
-Anyone can then run it with:
+```sh
+docker compose logs -f   # View logs (Ctrl+C to exit)
+docker compose ps        # Check container health
+docker compose down      # Stop and remove the container
+```
 
-    docker run -p 3000:3000 <dockerhub-username>/hello-greeter:latest
+If port 3000 is already in use:
 
-## Automatic push with GitHub Actions
-`.github/workflows/docker-publish.yml` builds and pushes the image on every push to `main`.
-Add two repo secrets (GitHub repo > Settings > Secrets and variables > Actions):
-- `DOCKERHUB_USERNAME` - your Docker Hub username
-- `DOCKERHUB_TOKEN` - an access token from Docker Hub > Account settings > Personal access tokens
+```sh
+HOST_PORT=8080 docker compose up --build -d
+```
+
+Then open http://localhost:8080. Use the same HOST_PORT value with subsequent Compose commands.
+
+The image uses Node.js 24, runs as a non-root user, and checks `/api/greeting` every 30 seconds. No npm packages are needed.
+
+## Run without Docker
+
+```sh
+npm start
+```
+
+## Build and run without Compose
+
+```sh
+docker build -t hello-greeter:local .
+docker run --rm --init -p 127.0.0.1:3000:3000 hello-greeter:local
+```
+
+## GitHub and automatic Docker Hub publishing
+
+This checkout is already connected to https://github.com/Anishpandey00/hello-greeter.
+
+Review and push your changes:
+
+```sh
+git diff
+git add Dockerfile compose.yaml .dockerignore server.js README.md
+git commit -m "Improve Docker setup and add Compose"
+git push origin main
+```
+
+The existing GitHub Actions workflow builds and publishes to Docker Hub on pushes to `main`. Configure these repository secrets under **Settings > Secrets and variables > Actions** before pushing:
+
+- `DOCKERHUB_USERNAME`: your Docker Hub username.
+- `DOCKERHUB_TOKEN`: a Docker Hub access token with permission to push images.
+
+Without those secrets, the publishing workflow will fail. Never put tokens in project files or chat.
+
+After publishing, others can run:
+
+```sh
+docker run --rm --init -p 127.0.0.1:3000:3000 <dockerhub-username>/hello-greeter:latest
+```
